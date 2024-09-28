@@ -61,7 +61,7 @@ If this is your situation, CloneChat can help you. 😁
 ## Download
 
 To download clonechat on your PC:
-- [access its repository](https://github.com/apenasrr/clonechat/)
+- [access its repository](https://github.com/sarvar0804/clonechat/)
 - Click on the green "**<> Code**" button
 - Finish by clicking on "Download ZIP"
 - Extract the contents into a new empty folder
@@ -100,8 +100,8 @@ You need to have the api_id and api_hash of your account before running clonecha
 - The first time you use it, you'll need to authenticate a connection with Telegram. But it will only be the first time! And then never again. :) Authenticating is simple, follow these steps:
   > `"Enter phone number or bot token:"`
   - This message will appear asking for your phone number in international format.
-  - Enter your phone number with the prefix `+55` for Brazilian phones, followed by the local area code and your phone number.
-    - Example: For a São Paulo phone, with area code 11, you should enter something like: `+5511995429405`
+  - Enter your phone number with the prefix `+888` for Anonymous phones, followed by the local area code and your phone number.
+    - Example: You should enter something like: `+8888080`
   - At the message asking if the number is correct, enter `y`.
   - A code will be sent to your Telegram, which you should enter in the terminal.
   - Finally, if you have "2-factor security" (2fa) activated on your account, your password will be requested.
@@ -215,14 +215,10 @@ There are several ways to get the chat_id of a channel. We'll show some of them:
 
 ### How to generate access credentials for the Telegram API?
 
-- Read the "Token configuration" topic in the tutorial found at: https://github.com/apenasrr/zimatise_docs#configura%C3%A7%C3%A3o-de-token
-
-Certainly, I'll continue translating the instructions for generating Telegram API credentials from where we left off:
-
 - To obtain credentials for the Telegram API:
   - Access the [app management](https://my.telegram.org/auth?to=apps) area on the Telegram website.
-  - Enter your phone number in international format. With prefix `+55` for Brazilian phones, followed by the local area code and your phone number.
-    - Example: For a São Paulo phone, with area code 11, you should enter something like: `+5511995429405`
+  - Enter your phone number in international format. With prefix `+888` for Anonymous phones, followed by the local area code and your phone number.
+    - Example: You should enter something like: `+8888080`
   - You will receive an authentication code in the Telegram app on your cell phone. Enter the code in the requested place and proceed.
   - On the new page there is a form that must be filled out
     - Application title: enter anything
@@ -263,12 +259,6 @@ Imagine that a channel after being created made 3 posts and deleted the first 2.
 
 This way, everything that was visible in the channel was cloned, where clonechat was just more informative, telling you in the terminal that there were 2 messages that were deleted in the past.
 
-### Can I use clonechat without having Python installed?
-
-There is an independent version of clonechat developed by another person with online implementation, which can be executed by a PC or cell phone, without needing to install anything.
-
-Access: [https://github.com/Drrivao/Clonechat-Telegram-Colab](https://github.com/Drrivao/Clonechat-Telegram-Colab)
-
 ### Can I clone 2 different channels at the same time by opening another clonechat?
 
 It's not recommended because Telegram can ban your account. Telegram classifies excessive requests in the use of its API as flood abuse and applies punishment to those who do this. Clonechat is configured to forward messages every 10 seconds and thus "behave" to not be classified as flood. If someone copies clonechat in several different folders and clones several channels at the same time, the number of requests sent by the same account will multiply by 2, 3, 4... This will eventually result in a ban of the account for excessive requests.
@@ -284,10 +274,6 @@ The error `[400 CHAT_FORWARDS_RESTRICTED] - The chat restricts forwarding conten
 ### The error "Failed building wheel for tgcrypto" appeared
 
 The error is caused by lack of installation of "Microsoft Visual C++" version 14 or higher. To solve it, access the Microsoft website and download the [visual-cpp-build-tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/). During installation, check the option "Desktop development with C++". After installation, run the `update_libs.bat` file to update the dependencies.
-
-### I didn't understand anything... Is there a more detailed tutorial?
-
-Alternative tutorial: [Wandrey7 guide](https://wandrey7.github.io/guiaclonechat/)
 
 ### I still have questions... Can someone help me?
 

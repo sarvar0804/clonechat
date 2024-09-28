@@ -483,7 +483,7 @@ def main():
 
     print(
         f"\n....:: Clonechat - v{version} ::....\n"
-        + "github.com/apenasrr/clonechat/\n"
+        + "github.com/sarvar0804/clonechat/\n"
         + "-----------Protect Dw---------"
     )
     config_path = Path(".").absolute() / "user" / "config.ini"
