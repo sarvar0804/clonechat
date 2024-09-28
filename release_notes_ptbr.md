@@ -1,24 +1,24 @@
 # ReleaseNotes
 
 **v118 2024-08-11**
-- Feat: Para grupo com função de tópicos, agora existe capacidade de baixar todos os arquivos de um tópico específico através do `exec_downloadall.bat` e colando o link de uma mensagem do tópico. Também funciona para grupo com conteúdo protegido.
+- Feat: For groups with the topics function, there is now the ability to download all files from a specific topic using `exec_downloadall.bat` and pasting the link of a message from the topic. It also works for groups with protected content.
 
 **v117 2024-08-09**
-- Fix: Erro "KeyError file_name" ao executar clonechat_protect_dw.
+- Fix: "KeyError file_name" error when executing clonechat_protect_dw.
 
 **v116 2024-08-08**
-- Fix: clonechat_protect_up gerava erro "`json.decoder.JSONDecodeError`" ao executar a função show_history_overview. Causado por o histórico estar em processo de download. Agora emite mensagem de espera pelo download do histórico.
+- Fix: clonechat_protect_up was generating a "`json.decoder.JSONDecodeError`" when executing the show_history_overview function. Caused by the history being in the process of downloading. Now it emits a message to wait for the history download.
 
 **v115 2024-07-18**
-- Fix: clonechat_protect_up não encontrava arquivo de histórico do chat
-- Fix: DownloadAll gerando NotADirectoryError em chats com título contendo caracteres especiais
+- Fix: clonechat_protect_up couldn't find the chat history file
+- Fix: DownloadAll generating NotADirectoryError in chats with titles containing special characters
 
 **v114 2024-07-16**
-- Feat: clonechat_protect aceita identificação de canal ou grupo por link de mensagem
+- Feat: clonechat_protect accepts channel or group identification by message link
 
 **v113 2024-07-15**
-- Fix: Chats com título contendo caracteres especiais não geram mais erro no sistema de arquivos
+- Fix: Chats with titles containing special characters no longer generate errors in the file system
 
 **v112 2024-07-14**
-- Refact: clonechat_protect com esteira de download separada da esteira de upload
-- Feat: Scripts de execução baseado em ambiente virtual. Script de criar ambiente virtual (install.bat)
+- Refact: clonechat_protect with download pipeline separated from upload pipeline
+- Feat: Execution scripts based on virtual environment. Script to create virtual environment (install.bat)
