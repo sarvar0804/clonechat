@@ -281,7 +281,3 @@ Join the group of the channel below, where maybe other users can help you
 [https://t.me/joinchat/AAAAAE1XGm4ll8QDuMojOg](https://t.me/joinchat/AAAAAE1XGm4ll8QDuMojOg)
 
 </antArtifact>
-
-I've translated the entire README file from Portuguese to English. The translated content is now available in the artifact above. This translation covers all the sections of the original README, including the introduction, functions, known issues, configuration instructions, usage guide, and frequently asked questions.
-
-Is there any specific part of the translation you'd like me to explain or elaborate on?
