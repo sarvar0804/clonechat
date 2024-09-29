@@ -15,7 +15,12 @@ from setup import version
 
 from .pipe import upload
 from .utils import parser
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich.table import Table
 
+console = Console()
 
 def get_config_data(path_file_config: Path):
     """get default configuration data from file config.ini
@@ -102,6 +107,10 @@ def get_chat_info(
         # if chat_input is a message link, convert to chat_id
         base_chat_id = str(chat_input.split(base_link)[1].split("/")[0])
         chat_input = "-100" + base_chat_id
+    
+    # Add this condition to handle numeric chat_id inputs
+    if isinstance(chat_input, str) and chat_input.lstrip('-').isdigit():
+        chat_input = int(chat_input)
 
     try:
         chat_obj = client.get_chat(chat_input)
@@ -117,6 +126,7 @@ def get_chat_info(
         return False
     except Exception as e:
         print(e, f"\nInvalid chat_input: {chat_input}")
+        return False
 
 
 def get_chat_info_until(client: pyrogram.Client, message: str) -> dict:
@@ -322,16 +332,16 @@ def show_history_overview(history_path: Path) -> list[str]:
 
 def main():
 
-    print(
-        f"\n....:: Clonechat - v{version} ::....\n"
-        + "-----------Protect UP---------"
-    )
+    console.print(Panel.fit(
+        f"[bold cyan]Clonechat - v{version}[/bold cyan]\n[green]Protect UP[/green]",
+        border_style="bold"
+    ))
     config_path = Path(".").absolute() / "user" / "config.ini"
     config_data = get_config_data(path_file_config=config_path)
 
     session_folder = Path(".").absolute()
 
-    up_client_name = "user"
+    up_client_name = "user_up"
     # test_connection for upload client
     client_up = get_client(up_client_name, session_folder=session_folder)
 
@@ -341,7 +351,7 @@ def main():
     chat_origin_info = get_chat_info_until(client_up, message)
     chat_origin_title = parser.sanitize_string(chat_origin_info["chat_title"])
     chat_origin_id = chat_origin_info["chat_id"]
-    print(f"ORIGIN: {abs(chat_origin_id)}-{chat_origin_title}\n")
+    console.print(f"[bold]ORIGIN:[/bold] {abs(chat_origin_id)}-{chat_origin_title}\n")
 
     message = (
         "Enter the DESTINATION "
@@ -350,7 +360,7 @@ def main():
     chat_dest_info = get_chat_info_until(client_up, message)
     chat_dest_title = parser.sanitize_string(chat_dest_info["chat_title"])
     chat_dest_id = chat_dest_info["chat_id"]
-    print(f"DESTINATION: {abs(chat_dest_id)}-{chat_dest_title}\n")
+    console.print(f"[bold]DESTINATION:[/bold] {abs(chat_dest_id)}-{chat_dest_title}\n")
 
     # cloneplan_path
     folder_path_cloneplan = Path("protect_content") / "log_cloneplan"

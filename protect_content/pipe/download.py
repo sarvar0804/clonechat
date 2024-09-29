@@ -8,10 +8,12 @@ from time import sleep
 from typing import Union
 
 import pyrogram
+from rich.console import Console
+from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn, FileSizeColumn
 
 from ..utils.csv_util import open_csv, save_csv
-from ..utils.progress_bar import progress_bar
 
+console = Console()
 
 def get_next_to_download(cloneplan_path: Path) -> int:
     """returns the smallest message_id not yet done download
@@ -40,30 +42,60 @@ def get_next_to_download(cloneplan_path: Path) -> int:
 def download_media_core(
     client: pyrogram.Client, message: pyrogram.types.Message, file_path: Path
 ):
-    print(f"dw: {file_path.name}")
+    console.print(f"[bold cyan]Downloading:[/bold cyan] {file_path.name}")
     c_time = time.time()
     prefix = "DW"
 
-    while True:
-        return_ = client.download_media(
-            message,
-            file_name=file_path,
-            progress=progress_bar,
-            progress_args=(c_time, prefix),
-        )
-        if return_ is None:
-            print(f"{prefix}: {file_path.name} - Error. Retrying in 5 seconds")
-            sleep(5)
-        elif file_path.exists():
-            if os.path.getsize(file_path) == 0:
-                file_path.unlink()
-                sleep(5)
-            else:
-                break
-        else:
-            break
+    # Check if the message has media
+    if not message.media:
+        console.print(f"[bold yellow]Warning:[/bold yellow] Message {message.id} has no media to download.")
+        return
 
-    print("")
+    # Get the file size
+    file_size = getattr(message.document or message.video or message.audio or message.voice or message.video_note or message.animation or message.photo, "file_size", 0)
+
+    if file_size == 0:
+        console.print(f"[bold yellow]Warning:[/bold yellow] Message {message.id} has no file size information.")
+        return
+
+    with Progress(
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        "[progress.percentage]{task.percentage:>3.0f}%",
+        "•",
+        TimeRemainingColumn(),
+        "•",
+        FileSizeColumn(),
+        console=console,
+    ) as progress:
+        task = progress.add_task(f"[cyan]{prefix}:[/cyan]", total=file_size)
+        
+        def progress_callback(current, total):
+            progress.update(task, completed=current)
+
+        while True:
+            try:
+                return_ = client.download_media(
+                    message,
+                    file_name=file_path,
+                    progress=progress_callback,
+                )
+                if return_ is None:
+                    console.print(f"[bold red]Error:[/bold red] {file_path.name} - Retrying in 5 seconds")
+                    sleep(5)
+                elif file_path.exists():
+                    if os.path.getsize(file_path) == 0:
+                        file_path.unlink()
+                        sleep(5)
+                    else:
+                        break
+                else:
+                    break
+            except Exception as e:
+                console.print(f"[bold red]Error:[/bold red] {str(e)} - Retrying in 5 seconds")
+                sleep(5)
+
+    console.print()
 
 
 def get_size(start_path: Path = Path(".")) -> int:
@@ -154,17 +186,22 @@ def download_media(
     if file_path.exists():
         file_path.unlink()
 
-    # Awaits by download authorization
-    while True:
-        auth_download = check_auth_download(
-            file_size_bytes, download_folder, max_size_mb
-        )
-        if auth_download:
-            break
-        else:
-            sleep(5)
+    # Check if the message has media to download
+    if message.media:
+        # Awaits by download authorization
+        while True:
+            auth_download = check_auth_download(
+                file_size_bytes, download_folder, max_size_mb
+            )
+            if auth_download:
+                break
+            else:
+                sleep(5)
 
-    download_media_core(client, message, file_path)
+        download_media_core(client, message, file_path)
+    else:
+        console.print(f"[bold yellow]Warning:[/bold yellow] Message {message_id} has no media to download.")
+        file_path = None  # Set file_path to None if there's no media
 
     # register flag download and file_path
     set_downloaded(cloneplan_path, message_id, file_path)
@@ -211,11 +248,12 @@ def pipe_download(
         max_size_mb (int):
     """
 
+    console.print("[bold green]Starting media download...[/bold green]")
     message_id = None
     while message_id != 0:
         message_id = get_next_to_download(cloneplan_path)
         if message_id == 0:
-            print("-- Download done")
+            console.print("[bold green]Download completed![/bold green]")
             return
         # Identifies the type of post
         list_data = open_csv(cloneplan_path)
@@ -240,3 +278,5 @@ def pipe_download(
             # mark flag 'download' in cloneplan_path file
             file_path = ""
             set_downloaded(cloneplan_path, message_id, file_path)
+
+    console.print("[bold green]All downloads completed successfully![/bold green]")

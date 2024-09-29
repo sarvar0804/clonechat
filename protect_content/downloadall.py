@@ -7,14 +7,18 @@ from setup import version
 from . import clonechat_protect_down, cloneplan
 from .pipe import download
 from .utils import parser
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
 
+console = Console()
 
 def main():
 
-    print(
-        f"\n....:: Clonechat - v{version} ::....\n"
-        + "---------DownloadAll----------"
-    )
+    console.print(Panel.fit(
+        f"[bold cyan]Clonechat - v{version}[/bold cyan]\n[green]DownloadAll[/green]",
+        border_style="bold"
+    ))
 
     session_folder = Path(".").absolute()
     client = clonechat_protect_down.get_client(
@@ -35,12 +39,9 @@ def main():
     chat_origin_topic_id: int | None = chat_origin_info.get("topic_id", None)
     chat_origin_topic_name = chat_origin_info.get("topic_name", None)
     if chat_origin_topic_name:
-        print(
-            f"ORIGIN: {abs(chat_origin_id)}-{chat_origin_title}-"
-            + f"{chat_origin_topic_name}\n"
-        )
+        console.print(f"[bold]ORIGIN:[/bold] {abs(chat_origin_id)}-{chat_origin_title}-{chat_origin_topic_name}\n")
     else:
-        print(f"ORIGIN: {abs(chat_origin_id)}-{chat_origin_title}\n")
+        console.print(f"[bold]ORIGIN:[/bold] {abs(chat_origin_id)}-{chat_origin_title}\n")
 
     # cloneplan_path
     folder_path_cloneplan = Path("protect_content") / "log_cloneplan"

@@ -9,10 +9,15 @@ from pathlib import Path
 
 import pyrogram
 from pyrogram.errors import ChannelInvalid, FloodWait, PeerIdInvalid
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich.table import Table
 
 from setup import version
 
 DELAY_AMOUNT = 10
+console = Console()
 
 
 def get_config_data(path_file_config):
@@ -40,10 +45,10 @@ def foward_photo(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_photo(message, destination_chat)
@@ -61,10 +66,10 @@ def foward_text(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_text(message, destination_chat)
@@ -77,10 +82,10 @@ def foward_sticker(message, destination_chat):
         tg.send_sticker(chat_id=destination_chat, sticker=sticker_id)
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_sticker(message, destination_chat)
@@ -99,10 +104,10 @@ def foward_document(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_document(message, destination_chat)
@@ -121,10 +126,10 @@ def foward_animation(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_animation(message, destination_chat)
@@ -143,10 +148,10 @@ def foward_audio(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_audio(message, destination_chat)
@@ -165,10 +170,10 @@ def foward_voice(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_voice(message, destination_chat)
@@ -185,10 +190,10 @@ def foward_video_note(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_video_note(message, destination_chat)
@@ -207,10 +212,10 @@ def foward_video(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_video(message, destination_chat)
@@ -231,10 +236,10 @@ def foward_poll(message, destination_chat):
         )
         return
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     foward_poll(message, destination_chat)
@@ -272,29 +277,29 @@ def get_sender(message):
     if message.poll:
         return foward_poll
 
-    print("\nNot recognized message type:\n")
-    print(message)
+    console.print("\nNot recognized message type:\n")
+    console.print(message)
     raise Exception
 
 
 def get_input_type_to_copy():
 
     answer = ""
-    print("0 - All files")
-    print("1 - Photos")
-    print("2 - Text")
-    print("3 - Documents (pdf, zip, rar, ...)")
-    print("4 - Stickers")
-    print("5 - Animation")
-    print("6 - Audio files (music)")
-    print("7 - Voice message")
-    print("8 - Videos")
-    print("9 - Polls\n")
-    print(
+    console.print("0 - All files")
+    console.print("1 - Photos")
+    console.print("2 - Text")
+    console.print("3 - Documents (pdf, zip, rar, ...)")
+    console.print("4 - Stickers")
+    console.print("5 - Animation")
+    console.print("6 - Audio files (music)")
+    console.print("7 - Voice message")
+    console.print("8 - Videos")
+    console.print("9 - Polls\n")
+    console.print(
         "Enter the number(s) of the file type to clone, separating by comma."
     )
-    print("For example, to copy photos and documents type: 1,3")
-    answer = input("Your answer: ")
+    console.print("For example, to copy photos and documents type: 1,3")
+    answer = Prompt.ask("Your answer: ")
     return answer
 
 
@@ -323,7 +328,7 @@ def get_files_type_excluded_by_input(input_string):
         if "9" not in input_string:
             files_type_excluded += [foward_poll]
         if len(files_type_excluded) == 9:
-            print("Invalid option! Try again")
+            console.print("Invalid option! Try again")
             return get_files_type_excluded_by_input(input_string)
     return files_type_excluded
 
@@ -334,10 +339,10 @@ def get_message(origin_chat, message_id):
         message = tg.get_messages(origin_chat, message_id)
         return message
     except FloodWait as e:
-        print(f"..FloodWait {e.value} seconds..")
+        console.print(f"..FloodWait {e.value} seconds..")
         time.sleep(e.value)
     except Exception as e:
-        print(f"trying again... Due to: {e}")
+        console.print(f"trying again... Due to: {e}")
         time.sleep(10)
 
     return get_message(origin_chat, message_id)
@@ -345,14 +350,14 @@ def get_message(origin_chat, message_id):
 
 def task_type():
 
-    print("New cloning or continuation?\n1 = new\n2 = resume")
-    answer = input("Your answer: ")
+    console.print("New cloning or continuation?\n1 = new\n2 = resume")
+    answer = Prompt.ask("Your answer: ")
     if answer == "1":
         return 1
     elif answer == "2":
         return 2
     else:
-        print("\nInvalid answer.\n")
+        console.print("\nInvalid answer.\n")
         return task_type()
 
 
@@ -410,7 +415,7 @@ def get_files_type_excluded():
 def is_empty_message(message, message_id, last_message_id) -> bool:
 
     if message.empty or message.service or message.dice or message.location:
-        print(f"{message_id}/{last_message_id} (blank id)")
+        console.print(f"{message_id}/{last_message_id} (blank id)")
         wait_a_moment(message_id, skip=True)
         return True
     else:
@@ -420,7 +425,7 @@ def is_empty_message(message, message_id, last_message_id) -> bool:
 def must_be_ignored(func_sender, message_id, last_message_id) -> bool:
 
     if func_sender in FILES_TYPE_EXCLUDED:
-        print(f"{message_id}/{last_message_id} (skip by type)")
+        console.print(f"{message_id}/{last_message_id} (skip by type)")
         wait_a_moment(message_id, skip=True)
         return True
     else:
@@ -463,17 +468,17 @@ def check_chat_id(chat_id):
         chat_title = chat_obj.title
         return chat_title
     except ChannelInvalid:  # When you are not part of the channel
-        print("\nNon-accessible chat")
+        console.print("\nNon-accessible chat")
         if MODE == "bot":
-            print(
+            console.print(
                 "\nCheck that the bot is part of the chat as an administrator."
                 + "It is necessary for bot mode."
             )
         else:
-            print("\nCheck that the user account is part of the chat.")
+            console.print("\nCheck that the user account is part of the chat.")
         return False
     except PeerIdInvalid:  # When the chat_id is invalid
-        print(f"\nInvalid chat_id: {chat_id}")
+        console.print(f"\nInvalid chat_id: {chat_id}")
         return False
 
 
@@ -486,18 +491,18 @@ def ensure_connection(client_name):
                 useraccount.start()
                 return useraccount
             except:
-                print("Delete Session file and try again.")
+                console.print("Delete Session file and try again.")
 
         while True:
             try:
-                api_id = int(input("Enter your api_id: "))
-                api_hash = input("Enter your api_hash: ")
+                api_id = int(Prompt.ask("Enter your api_id: "))
+                api_hash = Prompt.ask("Enter your api_hash: ")
 
                 useraccount = pyrogram.Client("user", api_id, api_hash)
                 useraccount.start()
                 return useraccount
             except:
-                print("\nError. Try again.\n")
+                console.print("\nError. Try again.\n")
                 pass
     else:
         pass
@@ -509,13 +514,13 @@ def ensure_connection(client_name):
                 bot.start()
                 return bot
             except:
-                print("Delete Session file and try again.")
+                console.print("Delete Session file and try again.")
 
         while True:
             try:
-                api_id = int(input("Enter your api_id: "))
-                api_hash = input("Enter your api_hash: ")
-                bot_token = input("Enter your bot_token: ")
+                api_id = int(Prompt.ask("Enter your api_id: "))
+                api_hash = Prompt.ask("Enter your api_hash: ")
+                bot_token = Prompt.ask("Enter your bot_token: ")
 
                 bot = pyrogram.Client(
                     client_name, api_id, api_hash, bot_token=bot_token
@@ -523,16 +528,16 @@ def ensure_connection(client_name):
                 bot.start()
                 return bot
             except:
-                print("\nError. Try again.\n")
+                console.print("\nError. Try again.\n")
                 pass
 
 
 def main():
 
-    print(
-        f"\n....:: Clonechat - v{version} ::....\n"
-        + "github.com/apenasrr/clonechat/\n"
-    )
+    console.print(Panel.fit(
+        f"[bold cyan]Clonechat - v{version}[/bold cyan]\n[green]github.com/apenasrr/clonechat/[/green]",
+        border_style="bold"
+    ))
 
     global FILES_TYPE_EXCLUDED
     FILES_TYPE_EXCLUDED = get_files_type_excluded()
@@ -546,37 +551,35 @@ def main():
     list_posted = get_list_posted(int_task_type)
 
     message_id = get_first_message_id(list_posted)
-    while message_id < last_message_id:
-        message_id = message_id + 1
-        if message_id in list_posted:
-            continue
+    with console.status("[bold green]Cloning messages...") as status:
+        while message_id < last_message_id:
+            message_id = message_id + 1
+            if message_id in list_posted:
+                continue
 
-        message = get_message(origin_chat, message_id)
+            message = get_message(origin_chat, message_id)
 
-        if is_empty_message(message, message_id, last_message_id):
-            list_posted += [message.id]
-            continue
+            if is_empty_message(message, message_id, last_message_id):
+                list_posted += [message.id]
+                continue
 
-        func_sender = get_sender(message)
+            func_sender = get_sender(message)
 
-        if must_be_ignored(func_sender, message_id, last_message_id):
+            if must_be_ignored(func_sender, message_id, last_message_id):
+                list_posted += [message.id]
+                update_cache(CACHE_FILE, list_posted)
+                continue
+
+            func_sender(message, destination_chat)
+            console.print(f"Processing message: {message_id}/{last_message_id}")
+
             list_posted += [message.id]
             update_cache(CACHE_FILE, list_posted)
-            continue
 
-        func_sender(message, destination_chat)
-        print(f"{message_id}/{last_message_id}")
+            wait_a_moment(message_id)
 
-        list_posted += [message.id]
-        update_cache(CACHE_FILE, list_posted)
-
-        wait_a_moment(message_id)
-
-    print(
-        "\nChat cloning finished! :)\n"
-        + "If you are not going to continue this task for these chats, "
-        + "delete the posted.json file"
-    )
+    console.print("[bold green]Chat cloning finished! :)[/bold green]")
+    console.print("If you are not going to continue this task for these chats, delete the posted.json file")
 
 
 config_data = get_config_data(
@@ -620,7 +623,7 @@ else:
 
 
 useraccount = ensure_connection("user")
-print(f"{MODE=}")
+console.print(f"{MODE=}")
 if MODE == "bot":
     bot = ensure_connection("bot")
     tg = bot
@@ -636,7 +639,7 @@ NEW = options.new
 
 if options.orig is None:  # Menu interface
     while True:
-        origin_chat = int(input("Enter the origin id_chat:"))
+        origin_chat = int(Prompt.ask("Enter the origin id_chat: "))
         ORIGIN_CHAT_TITLE = check_chat_id(origin_chat)
         if ORIGIN_CHAT_TITLE:
             break
@@ -653,7 +656,7 @@ else:  # CLI interface
 
 if options.dest is None:  # Menu interface
     while True:
-        destination_chat = int(input("Enter the destination id_chat:"))
+        destination_chat = int(Prompt.ask("Enter the destination id_chat: "))
         DESTINATION_CHAT_TITLE = check_chat_id(origin_chat)
         if DESTINATION_CHAT_TITLE:
             break

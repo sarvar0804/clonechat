@@ -7,10 +7,13 @@ from pathlib import Path
 from time import sleep
 
 import pyrogram
+from rich.console import Console
+from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn, FileSizeColumn
 
 from ..utils.csv_util import open_csv, save_csv
-from ..utils.progress_bar import progress_bar
 from ..utils.timeout import time_out
+
+console = Console()
 
 
 def get_next_to_upload(cloneplan_path: Path, loop_seconds: int = 5) -> int:
@@ -240,111 +243,56 @@ def upload_media(
     history_path: Path,
     auto_restart: int,
 ):
-    """Cloning any message_id
-
-    Args:
-        client_name (str):
-        session_folder (Path):
-        client (pyrogram.Client): _description_
-        chat_id (int): _description_
-        message_id (int): _description_
-        cloneplan_path (Path): _description_
-        download_folder (Path): _description_
-        auto_restart (int): Restart upload if it takes longer than the definite amount of minutes
-    """
-
-    auto_restart_seconds = 60 * auto_restart
-    # file_path
-    #  get from cloneplan report because file_name is in different locations
-    #  depending the message type (video, document, photo, audio, voice)
     list_data = open_csv(cloneplan_path)
-
     dict_data = collections.OrderedDict(
         sorted(
             {int(row_data["id"]): row_data for row_data in list_data}.items()
         )
     )
-
-    # video, document, photo, audio, voice, text, sticker
     message_type = dict_data[message_id]["type"]
-
     file_path = dict_data[message_id]["file_path"]
     caption = get_caption(message_id, history_path)
-    print(f"up: {Path(file_path).name}")
-    if message_type == "video":
-        # send_video(
-        #     client_name, session_folder, chat_id, file_path, caption
-        # )
-        time_out(
-            auto_restart_seconds,
-            send_video,
-            {
-                "client_name": client_name,
-                "session_folder": session_folder,
-                "chat_id": chat_id,
-                "file_path": file_path,
-                "caption": caption,
-            },
-            True,
-        )
+    console.print(f"[bold cyan]Uploading:[/bold cyan] {Path(file_path).name}")
 
-    if message_type == "document":
-        # send_document(
-        #     client_name, session_folder, chat_id, file_path, caption
-        # )
-        time_out(
-            auto_restart_seconds,
-            send_document,
-            {
-                "client_name": client_name,
-                "session_folder": session_folder,
-                "chat_id": chat_id,
-                "file_path": file_path,
-                "caption": caption,
-            },
-            True,
-        )
-    if message_type == "photo":
-        send_photo(client_name, session_folder, chat_id, file_path, caption)
-    if message_type == "audio":
-        # send_audio(
-        #     client_name, session_folder, chat_id, file_path, caption
-        # )
-        time_out(
-            auto_restart_seconds,
-            send_audio,
-            {
-                "client_name": client_name,
-                "session_folder": session_folder,
-                "chat_id": chat_id,
-                "file_path": file_path,
-                "caption": caption,
-            },
-            True,
-        )
-    if message_type == "voice":
-        # send_voice(
-        #     client_name, session_folder, chat_id, file_path, caption
-        # )
-        time_out(
-            auto_restart_seconds,
-            send_voice,
-            {
-                "client_name": client_name,
-                "session_folder": session_folder,
-                "chat_id": chat_id,
-                "file_path": file_path,
-                "caption": caption,
-            },
-            True,
-        )
-    if message_type == "sticker":
+    upload_function = None
+    params = {
+        "client_name": client_name,
+        "session_folder": session_folder,
+        "chat_id": chat_id,
+    }
+
+    if message_type == "video":
+        upload_function = send_video
+        params.update({"file_path": file_path, "caption": caption})
+    elif message_type == "document":
+        upload_function = send_document
+        params.update({"file_path": file_path, "caption": caption})
+    elif message_type == "photo":
+        upload_function = send_photo
+        params.update({"file_path": file_path, "caption": caption})
+    elif message_type == "audio":
+        upload_function = send_audio
+        params.update({"file_path": file_path, "caption": caption})
+    elif message_type == "voice":
+        upload_function = send_voice
+        params.update({"file_path": file_path, "caption": caption})
+    elif message_type == "sticker":
         sticker_id = get_sticker_id(message_id, history_path)
-        send_sticker(client_name, session_folder, chat_id, sticker_id)
-    if message_type == "text":
+        upload_function = send_sticker
+        params["sticker_id"] = sticker_id
+    elif message_type == "text":
         text = get_text(message_id, history_path)
-        send_message(client_name, session_folder, chat_id, text)
-    print("")
+        upload_function = send_message
+        params["text"] = text
+
+    if upload_function:
+        time_out(
+            auto_restart * 60,
+            upload_function,
+            params,
+            True,
+        )
+    console.print()
 
 
 def set_clone(cloneplan_path: Path, message_id: int):
@@ -378,24 +326,12 @@ def pipe_upload(
     history_path: Path,
     auto_restart: int = 20,
 ):
-    """Upload all message_id in ascending order.
-    Mark in the cloneplan_path file the flag clone
-    whenever finish the upload of a file.
-
-    Args:
-        client_name (str):
-        session_folder (Path):
-        chat_id (int): _description_
-        cloneplan_path (Path): _description_
-        history_path (Path): _description_
-        auto_restart (int): Restart upload if it takes longer than the definite amount of minutes
-    """
-
+    console.print("[bold green]Starting media upload...[/bold green]")
     message_id = None
     while message_id != 0:
         message_id = get_next_to_upload(cloneplan_path)
         if message_id == 0:
-            print("-- Everything was uploaded :)")
+            console.print("[bold green]Everything was uploaded :)[/bold green]")
             return
 
         upload_media(
@@ -407,10 +343,27 @@ def pipe_upload(
             history_path,
             auto_restart,
         )
-        # mark flag clone in cloneplan_path file
         set_clone(cloneplan_path, message_id)
-
-        # delete local media to release space in the cache folder
         delete_local_media(cloneplan_path, message_id)
 
-    print("\n-- Everything was uploaded :)")
+    console.print("[bold green]All uploads completed successfully![/bold green]")
+
+
+def progress_bar(current, total, c_time, prefix=""):
+    with Progress(
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        "•",
+        FileSizeColumn(),
+        "•",
+        TimeRemainingColumn(),
+        console=console,
+        transient=True
+    ) as progress:
+        task = progress.add_task(f"[cyan]{prefix} Uploading", total=total)
+        while not progress.finished:
+            progress.update(task, completed=current)
+            if current >= total:
+                break
+            time.sleep(0.1)

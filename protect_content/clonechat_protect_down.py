@@ -11,12 +11,18 @@ from typing import Union
 
 import pyrogram
 from pyrogram.errors import ChannelInvalid, PeerIdInvalid
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich.table import Table
 
 from setup import version
 
 from . import cloneplan
 from .pipe import download
 from .utils import parser
+
+console = Console()
 
 
 def get_config_data(path_file_config: Path):
@@ -180,18 +186,8 @@ def get_chat_info(
 
 
 def get_chat_info_until(client: pyrogram.Client, message: str) -> dict:
-    """Continuously requests a chat identifier to return chat information:
-    (chat_id, chat_title)
-
-    Args:
-        client (pyrogram.Client): pyrogram client
-        message (str): request message for the user
-
-    Returns:
-        dict: keys: chat_id, chat_title
-    """
     while True:
-        return_question = input(message)
+        return_question = Prompt.ask(message)
         chat_input = (
             int(return_question)
             if return_question.replace("-", "").isnumeric()
@@ -201,8 +197,8 @@ def get_chat_info_until(client: pyrogram.Client, message: str) -> dict:
         if isinstance(origin_chat_info, dict):
             break
         else:
-            return_ = input(
-                "\nPress 'Enter' to try again or press something to close:\n"
+            return_ = Prompt.ask(
+                "\nPress [bold cyan]Enter[/bold cyan] to try again or press something to close"
             )
             if return_ == "":
                 pass
@@ -458,35 +454,38 @@ def show_history_overview(
     list_msgs = json.load(open(history_path, encoding="utf-8"))
     list_type = msgs_types()
     data_metrics = get_chat_data_metrics(list_msgs)
-    print(f"\nChat History: {history_path.parent.name}")
-    print(
-        f"duration: {data_metrics['hours']}h {data_metrics['minutes']}m "
-        + f"{data_metrics['seconds']:.1f}s"
-    )
-    print(f"total size: {(data_metrics['total_size'] / 1024**3):.3f} GB")
-    counter_type = get_msg_type_count(list_type, list_msgs)
 
-    print(f"msgs count by type: {json.dumps(counter_type, indent=2)}\n")
+    table = Table(title=f"Chat History: {history_path.parent.name}")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="magenta")
+
+    table.add_row("Duration", f"{data_metrics['hours']}h {data_metrics['minutes']}m {data_metrics['seconds']:.1f}s")
+    table.add_row("Total Size", f"{(data_metrics['total_size'] / 1024**3):.3f} GB")
+
+    counter_type = get_msg_type_count(list_type, list_msgs)
+    for msg_type, count in counter_type.items():
+        table.add_row(msg_type, str(count))
+
+    console.print(table)
 
 
 def main():
-    print(
-        f"\n....:: Clonechat - v{version} ::....\n"
-        + "-----------Protect Dw---------"
-    )
+    console.print(Panel.fit(
+        f"[bold cyan]Clonechat - v{version}[/bold cyan]\n[green]Protect Dw[/green]",
+        border_style="bold"
+    ))
+
     config_path = Path(".").absolute() / "user" / "config.ini"
     config_data = get_config_data(path_file_config=config_path)
 
     session_folder = Path(".").absolute()
     client = get_client("user", session_folder=session_folder)
 
-    message = (
-        "Enter the ORIGIN messsage_link, chat_id, chat_link or chat_username: "
-    )
+    message = "Enter the ORIGIN messsage_link, chat_id, chat_link or chat_username: "
     chat_origin_info = get_chat_info_until(client, message)
     chat_origin_title = parser.sanitize_string(chat_origin_info["chat_title"])
     chat_origin_id = chat_origin_info["chat_id"]
-    print(f"ORIGIN: {abs(chat_origin_id)}-{chat_origin_title}\n")
+    console.print(f"[bold]ORIGIN:[/bold] {abs(chat_origin_id)}-{chat_origin_title}\n")
 
     # cloneplan_path
     folder_path_cloneplan = Path("protect_content") / "log_cloneplan"
@@ -501,12 +500,13 @@ def main():
 
     if new_clone:
         history_path = get_history_path(chat_origin_title, chat_origin_id)
+        console.print("[bold green]Saving chat history...[/bold green]")
         save_history(client, chat_origin_id, history_path)
-
+        
+        console.print("[bold green]Saving cloneplan...[/bold green]")
         cloneplan.save_cloneplan(history_path, cloneplan_path)
     else:
         history_path = get_recent_history(chat_origin_title, chat_origin_id)
-
         show_history_overview(history_path)
 
         # download_folder
@@ -528,6 +528,8 @@ def main():
             download_folder,
             cache_folder_max_size_mb,
         )
+
+    console.print("[bold green]Process completed successfully![/bold green]")
 
 
 if __name__ == "__main__":

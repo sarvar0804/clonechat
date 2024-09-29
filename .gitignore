@@ -130,6 +130,7 @@ dmypy.json
 
 # Custom settings
 user.session
+user_up.session
 user.session-journal
 log_chats
 log_cloneplan
