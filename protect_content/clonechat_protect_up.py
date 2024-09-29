@@ -324,7 +324,6 @@ def main():
 
     print(
         f"\n....:: Clonechat - v{version} ::....\n"
-        + "github.com/sarvar0804/clonechat/\n"
         + "-----------Protect UP---------"
     )
     config_path = Path(".").absolute() / "user" / "config.ini"
@@ -332,7 +331,7 @@ def main():
 
     session_folder = Path(".").absolute()
 
-    up_client_name = "user_up"
+    up_client_name = "user"
     # test_connection for upload client
     client_up = get_client(up_client_name, session_folder=session_folder)
 

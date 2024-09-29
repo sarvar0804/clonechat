@@ -13,7 +13,6 @@ def main():
 
     print(
         f"\n....:: Clonechat - v{version} ::....\n"
-        + "github.com/sarvar0804/clonechat/\n"
         + "---------DownloadAll----------"
     )
 
