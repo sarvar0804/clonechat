@@ -128,5 +128,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# User settings
+# Custom settings
 user.session
+user.session-journal
+log_chats
+log_cloneplan

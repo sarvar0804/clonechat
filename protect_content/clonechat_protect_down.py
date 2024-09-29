@@ -127,26 +127,11 @@ def get_topic_data_from_link(
 def get_chat_info(
     client: pyrogram.Client, chat_input: Union[int, str]
 ) -> Union[dict, bool]:
-    """Returns the chat_info (chat_id, chat_title) if chat_input is valid.
-        Returns false if it is invalid.
-    Valid chat_input: messsage_link, chat_id, invite link, chat_link,
-        chat_username
-
-    Args:
-        client (pyrogram.Client): started pyrogram client
-        chat_input (Union[int, str]): chat_id or invite link
-
-    Returns:
-        Union[dict, bool]:
-            {chat_id, chat_title}
-            or False if chat_input invalid
-    """
-
     base_link = "https://t.me/c/"
     topic_id = None
     topic_name = None
+    
     if base_link in str(chat_input):
-        # if chat_input is a message link, convert to chat_id
         splits = chat_input.split(base_link)[1].split("/")
         chat_id = "-100" + str(splits[0])
         topic_data = get_topic_data_from_link(client, chat_id, chat_input)
@@ -158,34 +143,40 @@ def get_chat_info(
         chat_obj = client.get_chat(chat_input)
         chat_id = chat_obj.id
         chat_title = chat_obj.title
-        chat_isforum = chat_obj.is_forum
-        if chat_isforum:
-            if topic_id is None:
-                print(
-                    f"\nThis chat is a forum: {chat_title}\n"
-                    + "Please, repeat posting a message link from a topic."
-                )
-                # TODO: If it is a forum, look for topics list and ask which
-                # one wants
-                client.stop()
-                exit(0)
-            else:
-                pass
+        chat_type = chat_obj.type  # Get the chat type
+
         chat_info = {
             "chat_id": chat_id,
             "chat_title": chat_title,
-            "topic_id": topic_id,
-            "topic_name": topic_name,
+            "chat_type": chat_type,
+            "topic_id": None,
+            "topic_name": None,
         }
+
+        # Only check for forum and topics if the chat is a supergroup
+        if chat_type == "supergroup":
+            chat_isforum = getattr(chat_obj, 'is_forum', False)
+            if chat_isforum:
+                if topic_id is None:
+                    print(
+                        f"\nThis chat is a forum: {chat_title}\n"
+                        + "Please, repeat posting a message link from a topic."
+                    )
+                    return False
+                else:
+                    chat_info["topic_id"] = topic_id
+                    chat_info["topic_name"] = topic_name
+
         return chat_info
-    except ChannelInvalid:  # When you are not part of the channel
+    except ChannelInvalid:
         print("\nNon-accessible chat")
         return False
-    except PeerIdInvalid as e:  # When the chat_id is invalid
+    except PeerIdInvalid as e:
         print(f"\n{e}\nInvalid chat_input: {chat_input}")
         return False
     except Exception as e:
         print(e, f"\nInvalid chat_input: {chat_input}")
+        return False
 
 
 def get_chat_info_until(client: pyrogram.Client, message: str) -> dict:
@@ -437,7 +428,6 @@ def show_history_overview(
         }
 
     def get_msg_type_count(list_type, list_msgs):
-
         counter_type = {}
         for msg in list_msgs:
             if isinstance(msg, str):
@@ -480,10 +470,9 @@ def show_history_overview(
 
 
 def main():
-
     print(
         f"\n....:: Clonechat - v{version} ::....\n"
-        + "github.com/sarvar0804/clonechat/\n"
+            + "github.com/sarvar0804/clonechat/\n"
         + "-----------Protect Dw---------"
     )
     config_path = Path(".").absolute() / "user" / "config.ini"
@@ -504,7 +493,7 @@ def main():
     folder_path_cloneplan = Path("protect_content") / "log_cloneplan"
     folder_path_cloneplan.mkdir(exist_ok=True)
     cloneplan_path = get_cloneplan_path(
-        folder_path_cloneplan, chat_origin_id, chat_origin_title
+            folder_path_cloneplan, chat_origin_id, chat_origin_title
     )
 
     new_clone = True
@@ -519,27 +508,27 @@ def main():
     else:
         history_path = get_recent_history(chat_origin_title, chat_origin_id)
 
-    show_history_overview(history_path)
+        show_history_overview(history_path)
 
-    # download_folder
-    cache_folder = Path("protect_content") / "Cache"
-    cache_folder.mkdir(exist_ok=True)
-    download_folder = (
-        cache_folder / f"{str(abs(chat_origin_id))}-{chat_origin_title}"
-    )
-    download_folder.mkdir(exist_ok=True)
+        # download_folder
+        cache_folder = Path("protect_content") / "Cache"
+        cache_folder.mkdir(exist_ok=True)
+        download_folder = (
+            cache_folder / f"{str(abs(chat_origin_id))}-{chat_origin_title}"
+        )
+        download_folder.mkdir(exist_ok=True)
 
-    cache_folder_max_size_mb = int(
-        config_data.get("cache_folder_max_size_mb", 6000)
-    )
+        cache_folder_max_size_mb = int(
+            config_data.get("cache_folder_max_size_mb", 6000)
+        )
 
-    download.pipe_download(
-        client,
-        chat_origin_id,
-        cloneplan_path,
-        download_folder,
-        cache_folder_max_size_mb,
-    )
+        download.pipe_download(
+            client,
+            chat_origin_id,
+            cloneplan_path,
+            download_folder,
+            cache_folder_max_size_mb,
+        )
 
 
 if __name__ == "__main__":
