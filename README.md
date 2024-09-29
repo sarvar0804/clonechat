@@ -61,7 +61,7 @@ If this is your situation, CloneChat can help you. 😁
 ## Download
 
 To download clonechat on your PC:
-- [access its repository](https://github.com/sarvar0804/clonechat/)
+- [access its repository](https://github.com/apenasrr/clonechat)
 - Click on the green "**<> Code**" button
 - Finish by clicking on "Download ZIP"
 - Extract the contents into a new empty folder
