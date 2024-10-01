@@ -135,3 +135,5 @@ user.session-journal
 log_chats
 log_cloneplan
 Cache
+$persist_dir
+clear.py
